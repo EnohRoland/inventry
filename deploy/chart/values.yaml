@@ -1,0 +1,20 @@
+backend:
+  repository: goshenignite-api
+  tag: local
+frontend:
+  repository: goshenignite-web
+  tag: local
+replicas: 2
+appOrigin: https://inventory.example.com
+databaseSecret: inventory-db
+ingress:
+  enabled: true
+  host: inventory.example.com
+  certificateArn: ""
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+networkPolicy:
+  enabled: true
+  vpcCidr: 10.42.0.0/16

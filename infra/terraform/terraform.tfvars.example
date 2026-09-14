@@ -1,0 +1,8 @@
+aws_region             = "us-east-1"
+environment            = "production"
+github_repository      = "YOUR-ORGANIZATION/inventry"
+administrator_role_arn = "arn:aws:iam::123456789012:role/PlatformAdministrator"
+# Empty means private EKS API. Use VPN/SSM-connected admin host and a VPC runner.
+eks_public_access_cidrs = []
+# If GitHub OIDC already exists in this account:
+# github_oidc_provider_arn = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"

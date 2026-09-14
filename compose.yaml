@@ -1,0 +1,64 @@
+name: goshenignite
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: inventory
+      POSTGRES_USER: inventory
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env first}
+    ports: ['127.0.0.1:5432:5432']
+    volumes: ['postgres_data:/var/lib/postgresql/data']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U inventory -d inventory']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  migrate:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    image: goshenignite-api:local
+    environment:
+      DATABASE_URL: postgres://inventory:${POSTGRES_PASSWORD}@database:5432/inventory
+    command: ['node', 'backend/dist/migrate.js']
+    depends_on:
+      database: { condition: service_healthy }
+  seed:
+    image: goshenignite-api:local
+    profiles: ['tools']
+    environment:
+      DATABASE_URL: postgres://inventory:${POSTGRES_PASSWORD}@database:5432/inventory
+      NODE_ENV: development
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD}
+      SEED_DEMO: ${SEED_DEMO:-false}
+    command: ['node', 'backend/dist/seed.js']
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+  backend:
+    image: goshenignite-api:local
+    init: true
+    environment:
+      DATABASE_URL: postgres://inventory:${POSTGRES_PASSWORD}@database:5432/inventory
+      NODE_ENV: development
+      APP_ORIGIN: http://localhost:8080
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/api/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  frontend:
+    build: { context: ., dockerfile: frontend/Dockerfile }
+    ports: ['127.0.0.1:8080:8080']
+    depends_on:
+      backend: { condition: service_healthy }
+    restart: unless-stopped
+volumes:
+  postgres_data:

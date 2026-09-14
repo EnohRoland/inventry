@@ -1,0 +1,90 @@
+name: Release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          { POSTGRES_USER: inventory, POSTGRES_PASSWORD: ci-test-password, POSTGRES_DB: inventory }
+        ports: [5432:5432]
+        options: --health-cmd "pg_isready -U inventory -d inventory" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:integration
+        env: { DATABASE_URL: 'postgres://inventory:ci-test-password@localhost:5432/inventory' }
+      - run: npm audit --omit=dev --audit-level=high
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      matrix: { tier: [backend, frontend] }
+    env:
+      IMAGE_TAG: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_BUILD_ROLE_ARN }}
+          aws-region: us-east-1
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+      - name: Build candidate
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.tier }}/Dockerfile
+          load: true
+          tags: ${{ vars.ECR_REGISTRY }}/goshenignite-production/${{ matrix.tier }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha,scope=${{ matrix.tier }}
+      - uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ${{ vars.ECR_REGISTRY }}/goshenignite-production/${{ matrix.tier }}:${{ env.IMAGE_TAG }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+      - name: Push scanned image
+        env:
+          IMAGE: ${{ vars.ECR_REGISTRY }}/goshenignite-production/${{ matrix.tier }}:${{ env.IMAGE_TAG }}
+        run: docker push "$IMAGE"
+  deploy:
+    needs: publish
+    # Dedicated ephemeral runner with private VPC connectivity. Never run PR jobs here.
+    runs-on: [self-hosted, linux, x64, goshenignite-deploy]
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+      - run: bash scripts/deploy.sh
+        env:
+          AWS_REGION: us-east-1
+          CLUSTER_NAME: goshenignite-production
+          BACKEND_REPOSITORY: ${{ vars.ECR_REGISTRY }}/goshenignite-production/backend
+          FRONTEND_REPOSITORY: ${{ vars.ECR_REGISTRY }}/goshenignite-production/frontend
+          IMAGE_TAG: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          APP_HOST: ${{ vars.APP_HOST }}
+          ACM_CERTIFICATE_ARN: ${{ vars.ACM_CERTIFICATE_ARN }}

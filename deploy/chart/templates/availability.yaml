@@ -1,0 +1,26 @@
+{{- range $app := list "backend" "frontend" }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $app }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: { app: {{ $app }} }
+---
+{{- end }}
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: backend }
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 70 }
+{{- end }}

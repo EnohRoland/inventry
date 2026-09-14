@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+coverage/
+.terraform/
+*.tfstate*
+*.tfplan
+terraform.tfvars
+backend.hcl
+*.pem
+*.log
+*.tsbuildinfo
+test-results/
+playwright-report/
+.local/

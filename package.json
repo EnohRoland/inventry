@@ -1,0 +1,26 @@
+{
+  "name": "goshenignite-inventory",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspace backend",
+    "test:integration": "npm run test:integration --workspace backend",
+    "dev:api": "npm run dev --workspace backend",
+    "dev:web": "npm run dev --workspace frontend",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:seed": "npm run db:seed --workspace backend",
+    "test:e2e": "playwright test",
+    "format": "prettier --write frontend/src backend/src backend/test e2e playwright.config.ts"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "prettier": "^3.9.6"
+  }
+}
