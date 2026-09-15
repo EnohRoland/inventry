@@ -53,7 +53,7 @@ jobs:
           load: true
           tags: ${{ vars.ECR_REGISTRY }}/goshenignite-production/${{ matrix.tier }}:${{ env.IMAGE_TAG }}
           cache-from: type=gha,scope=${{ matrix.tier }}
-      - uses: aquasecurity/trivy-action@0.33.1
+      - uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: ${{ vars.ECR_REGISTRY }}/goshenignite-production/${{ matrix.tier }}:${{ env.IMAGE_TAG }}
           format: table
