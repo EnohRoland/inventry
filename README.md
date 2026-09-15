@@ -87,7 +87,7 @@ Integration tests use an ephemeral PGlite PostgreSQL engine if `DATABASE_URL` is
 | `scripts/` | Cluster bootstrap, operator jobs, release deployment |
 | `docs/` | Architecture, API reference, AWS deployment, operational notes |
 
-Start with [the AWS deployment guide](docs/DEPLOYMENT.md) before provisioning. It explains the account, repository, domain/certificate, and private deployment runner inputs. No AWS resources are created by cloning or building this project.
+New to this project? Start with [docs/OVERVIEW.md](docs/OVERVIEW.md) for a plain-English, diagram-led tour of how the app fits together and what's been built so far. Start with [the AWS deployment guide](docs/DEPLOYMENT.md) before provisioning. It explains the account, repository, domain/certificate, and private deployment runner inputs. No AWS resources are created by cloning or building this project.
 
 ## Current boundaries
 
