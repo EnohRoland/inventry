@@ -794,6 +794,12 @@ footer span {
   flex: 1;
   min-width: 190px;
 }
+.barcode-input input {
+  color: #263d36;
+}
+.barcode-input input::placeholder {
+  color: #9daa9f;
+}
 .barcode-row button {
   display: inline-flex;
   align-items: center;
