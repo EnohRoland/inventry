@@ -459,4 +459,27 @@ export const translations: Record<string, readonly [string, string]> = {
     'Un article ne peut apparaître qu’une seule fois',
     'Un artículo solo puede aparecer una vez',
   ],
+  'Scan barcode (optional)': ['Scanner un code-barres (facultatif)', 'Escanear código de barras (opcional)'],
+  'Scan or type a barcode/SKU, then press Enter': [
+    'Scannez ou saisissez un code-barres/SKU, puis appuyez sur Entrée',
+    'Escanee o escriba un código de barras/SKU y presione Enter',
+  ],
+  'Scan with camera': ['Scanner avec la caméra', 'Escanear con la cámara'],
+  'Stop camera': ['Arrêter la caméra', 'Detener la cámara'],
+  'Camera scanning needs Chrome/Edge over HTTPS.': [
+    'La numérisation par caméra nécessite Chrome/Edge via HTTPS.',
+    'El escaneo por cámara requiere Chrome/Edge a través de HTTPS.',
+  ],
+  'Camera access was denied or is unavailable.': [
+    'L’accès à la caméra a été refusé ou est indisponible.',
+    'Se denegó el acceso a la cámara o no está disponible.',
+  ],
+  'Point the camera at a barcode.': [
+    'Pointez la caméra vers un code-barres.',
+    'Apunte la cámara hacia un código de barras.',
+  ],
+  'No item matches that barcode.': [
+    'Aucun article ne correspond à ce code-barres.',
+    'Ningún artículo coincide con ese código de barras.',
+  ],
 };

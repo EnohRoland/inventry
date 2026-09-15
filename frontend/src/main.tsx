@@ -37,6 +37,7 @@ import {
   type Order,
   type Audit,
 } from './api';
+import { BarcodeScan } from './barcode';
 import { t, locale, useLanguage, setLanguage, errorText, type Language } from './i18n';
 import './styles.css';
 
@@ -275,6 +276,10 @@ function App() {
     [formError, setFormError] = useState('');
   const [movementType, setMovementType] = useState('receive');
   const [lines, setLines] = useState([{ item_id: '', quantity: 1, unit_cost: 0 }]);
+  const [scanItemId, setScanItemId] = useState(''),
+    [scanNotice, setScanNotice] = useState('');
+  const findByBarcode = (code: string) =>
+    items.find((i) => i.sku.toLowerCase() === code.trim().toLowerCase()) || null;
   const manager = user?.role === 'admin' || user?.role === 'manager';
   const canMove = manager || user?.role === 'staff';
   useEffect(() => {
@@ -326,6 +331,8 @@ function App() {
     setFormError('');
     setMovementType('receive');
     setLines([{ item_id: '', quantity: 1, unit_cost: 0 }]);
+    setScanItemId('');
+    setScanNotice('');
     setModal(type);
   }
   async function action(path: string, method: string, body?: unknown) {
@@ -847,6 +854,14 @@ function App() {
                 <span className="muted">
                   {filtered.length} {t('items')}
                 </span>
+              </div>
+              <div className="filters">
+                <BarcodeScan
+                  onScan={(code) => {
+                    const match = findByBarcode(code);
+                    setSearch(match ? match.sku : code);
+                  }}
+                />
               </div>
               {filtered.length ? (
                 <div className="table-wrap">
@@ -1375,8 +1390,27 @@ function App() {
             )}
             {modal === 'movement' && (
               <>
+                <Field label={t('Scan barcode (optional)')}>
+                  <BarcodeScan
+                    onScan={(code) => {
+                      const match = findByBarcode(code);
+                      setScanItemId(match?.id || '');
+                      setScanNotice(match ? '' : t('No item matches that barcode.'));
+                    }}
+                  />
+                </Field>
+                {scanNotice && (
+                  <p className="error" role="alert">
+                    {scanNotice}
+                  </p>
+                )}
                 <Field label={t('Item')}>
-                  <select name="item_id" required>
+                  <select
+                    name="item_id"
+                    required
+                    value={scanItemId}
+                    onChange={(e) => setScanItemId(e.target.value)}
+                  >
                     {selectItems}
                   </select>
                 </Field>
