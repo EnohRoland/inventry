@@ -57,6 +57,7 @@ jobs:
   containers:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix: { tier: [backend, frontend] }
     steps:
       - uses: actions/checkout@v4
@@ -78,3 +79,4 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: CRITICAL,HIGH
+          version: v0.74.0

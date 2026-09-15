@@ -61,6 +61,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: CRITICAL,HIGH
+          version: v0.74.0
       - name: Push scanned image
         env:
           IMAGE: ${{ vars.ECR_REGISTRY }}/goshenignite-production/${{ matrix.tier }}:${{ env.IMAGE_TAG }}
