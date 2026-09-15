@@ -365,6 +365,7 @@ app.patch('/api/users/:id', roles('admin'), async (req, res) => {
   });
   res.status(204).end();
 });
+if (process.env.SERVE_FRONTEND_DIR) app.use(express.static(process.env.SERVE_FRONTEND_DIR));
 app.use((_req, _res, next) => next(new HttpError(404, 'Route not found')));
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof ZodError)

@@ -32,6 +32,8 @@ flowchart TD
 
 Both paths read the same code. The difference is durability, cost, and how much AWS machinery stands behind the app once it's live. The demo server was torn down after review — nothing is left running or costing money from it. The code that produced it is still safely in GitHub, ready to stand back up in minutes.
 
+There's a third option that isn't AWS at all: [desktop/](../desktop) packages the same application as a normal Windows installer, with a real PostgreSQL bundled inside it that starts automatically. No Docker, no cloud account, no ongoing cost — it just runs on one Windows PC. See [desktop/README.md](../desktop/README.md).
+
 ## 3. The new trick: scanning barcodes
 
 Every item in the catalog already carries a short code — its SKU, like `EQP-001` for a digital thermometer. Barcode scanning doesn't add anything new to the database; it just gives a faster way to type that code in.

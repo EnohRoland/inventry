@@ -15,3 +15,6 @@ backend.hcl
 test-results/
 playwright-report/
 .local/
+.claude/
+desktop/vendor/
+desktop/release/

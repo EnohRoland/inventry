@@ -57,6 +57,10 @@ npm.cmd run dev:web
 
 The Vite frontend runs at `http://localhost:8080` and proxies `/api` to port 3000. The API accepts browser mutations only from `APP_ORIGIN`; keep that setting aligned with the URL you use.
 
+## Install as a standalone Windows app
+
+`desktop/` packages this same application as a normal Windows installer — no Docker, no separate database to run, no AWS. It bundles a real PostgreSQL that starts automatically in the background. See [desktop/README.md](desktop/README.md) for how to build `GoshenigniteInventorySetup.exe`.
+
 ## Verify
 
 ```powershell
@@ -85,6 +89,7 @@ Integration tests use an ephemeral PGlite PostgreSQL engine if `DATABASE_URL` is
 | `deploy/platform.yaml` | Namespace, deployer RBAC, external database secret |
 | `.github/workflows/` | CI validation and manually triggered build/scan/publish/deploy pipeline |
 | `scripts/` | Cluster bootstrap, operator jobs, release deployment |
+| `desktop/` | Standalone Windows installer (Electron + bundled PostgreSQL) |
 | `docs/` | Architecture, API reference, AWS deployment, operational notes |
 
 New to this project? Start with [docs/OVERVIEW.md](docs/OVERVIEW.md) for a plain-English, diagram-led tour of how the app fits together and what's been built so far. Start with [the AWS deployment guide](docs/DEPLOYMENT.md) before provisioning. It explains the account, repository, domain/certificate, and private deployment runner inputs. No AWS resources are created by cloning or building this project.

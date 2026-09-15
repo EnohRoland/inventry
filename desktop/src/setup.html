@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Set up Goshenignite Inventory</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f5f7f6; color: #16231d;
+    display: flex; align-items: center; justify-content: center;
+    height: 100vh;
+  }
+  .card {
+    width: 380px; background: #fff; border: 1px solid #dfe7e0; border-radius: 10px;
+    padding: 28px 30px; box-shadow: 0 10px 28px rgba(22,35,29,.08);
+  }
+  h1 { font-size: 19px; margin: 0 0 6px; }
+  p.sub { font-size: 13px; color: #63756a; margin: 0 0 20px; }
+  label { display: block; font-size: 12.5px; font-weight: 600; margin: 14px 0 5px; }
+  input[type="email"], input[type="password"] {
+    width: 100%; padding: 9px 10px; border: 1px solid #dce5dd; border-radius: 6px; font-size: 14px;
+  }
+  .hint { font-size: 11.5px; color: #8d9a8e; margin-top: 4px; }
+  .check-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+  .check-row input { width: auto; }
+  .check-row label { margin: 0; font-weight: 500; font-size: 13px; }
+  button {
+    width: 100%; margin-top: 22px; padding: 11px; border: none; border-radius: 7px;
+    background: #17614f; color: #fff; font-size: 14.5px; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .6; cursor: default; }
+  .error {
+    margin-top: 14px; padding: 10px 12px; background: #fff0eb; color: #a94c39;
+    border: 1px solid #f2d2c8; border-radius: 6px; font-size: 12.5px; display: none;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Welcome — let's set up your workspace</h1>
+    <p class="sub">This is a one-time step to create your administrator account for this installation.</p>
+    <form id="setup-form">
+      <label for="email">Email address</label>
+      <input id="email" type="email" required autocomplete="username" />
+
+      <label for="password">Password</label>
+      <input id="password" type="password" required minlength="14" autocomplete="new-password" />
+      <div class="hint">At least 14 characters.</div>
+
+      <div class="check-row">
+        <input id="sample" type="checkbox" />
+        <label for="sample">Include sample inventory data so I can explore the app</label>
+      </div>
+
+      <button type="submit" id="submit-btn">Create account &amp; continue</button>
+      <div class="error" id="error"></div>
+    </form>
+  </div>
+  <script>
+    const form = document.getElementById('setup-form');
+    const errorBox = document.getElementById('error');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account…';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const includeSampleData = document.getElementById('sample').checked;
+
+      const result = await window.desktopAPI.createAdmin({ email, password, includeSampleData });
+
+      if (!result.ok) {
+        errorBox.textContent = result.message;
+        errorBox.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account & continue';
+      }
+      // On success, the main process closes this window and opens the app.
+    });
+  </script>
+</body>
+</html>
