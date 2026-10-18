@@ -26,6 +26,6 @@
     "supertest": "^7.1.4",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "@electric-sql/pglite": "^0.3.10"
+    "@electric-sql/pglite": "^0.5.8"
   }
 }
